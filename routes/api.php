@@ -17,7 +17,7 @@ Route::middleware('auth.token')->get('/me', function (Request $request) {
 
 Route::controller(AuthController::class)->group(function ($router) {
     Route::get('auth/login', 'login')->name('login');
-    Route::post('auth/register', 'register')->name('register');
+    Route::put('auth/register', 'register')->name('register');
     Route::post('auth/logout', 'logout')->name('logout')->middleware('auth.token');
     Route::post('auth/refresh', 'refresh')->name('refresh');
     Route::post('auth/reset', 'reset')->name('reset');

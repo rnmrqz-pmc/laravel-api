@@ -196,6 +196,51 @@ class AuthController extends Controller
 
     }
 
+        public function getStaging(Request $request){
+        try {
+            
+            $employeeNo = $request->input('employeeNo', '1234');
+
+            $query = DB::table('trainers_staging')->where('employeeNo', $employeeNo)->first();
+            if($query){
+                
+                $check = DB::table('trainers')->where('employeeNo', $query->employeeNo)->orWhere('email', $query->email)->first();
+                if($check){
+                    return response()->json([
+                        'status' => false,
+                        'error' => 'Invalid Info',
+                        'message' => 'User already exists'
+                    ], 200);
+                }
+
+                return response()->json([
+                    'status' => true,
+                    'data' => $this->isDev ? $query : CustomHelper::encryptPayload($query)
+                ], 200);
+            }else{
+                return response()->json([
+                    'status' => false,
+                    'error' => 'Invalid Info',
+                    'message' => 'Employee ID not found'
+                ], 200);
+            }
+
+        } catch (\Throwable $e) {
+            return response()->json([
+                'status' => false,
+                'error' => 'Server error',
+                'message' => $e->getMessage()
+            ], 500);
+        }
+
+
+        $payload = $this->isDev ? $request->all() : CustomHelper::decryptPayload($request->all());
+        return response()->json([
+            'status' => true,
+            'data' => $this->isDev ? $payload : CustomHelper::encryptPayload($payload)
+        ], 200);
+    }
+
 
 
 
