@@ -21,7 +21,7 @@ Route::controller(AuthController::class)->group(function ($router) {
     Route::post('auth/logout', 'logout')->name('logout')->middleware('auth.token');
     Route::post('auth/refresh', 'refresh')->name('refresh');
     Route::post('auth/reset', 'reset')->name('reset');
-    Route::post('auth/staging', 'getStaging')->name('getStaging');
+    Route::get('auth/staging', 'getStaging')->name('getStaging');
     Route::middleware('auth.token')->patch('auth/change-pass', 'changePass')->name('changePass');
 });
 
