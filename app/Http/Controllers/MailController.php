@@ -72,7 +72,7 @@ class MailController extends Controller
                 $message->to($to)
                         ->subject('Password Reset Request')
                         ->from(config('mail.from.address'), config('mail.from.name'))
-                        ->html($htmlContent); // ✅ use html() instead of setBody()
+                        ->html($htmlContent); 
             });
 
             return response()->json(['success' => true, 'message' => "Email sent to {$to}"]);

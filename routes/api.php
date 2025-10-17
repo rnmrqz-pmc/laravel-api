@@ -24,6 +24,7 @@ Route::controller(AuthController::class)->group(function ($router) {
     Route::middleware('auth.token')->patch('auth/change-pass', 'changePass')->name('changePass');
 });
 
+Route::get('/view/trainer', [DynamicDataController::class, 'getTrainer']);
 Route::middleware('auth.token')->get('/data/{table}', [DynamicDataController::class, 'fetchData']);
 Route::middleware('auth.token')->post('/data/{table}/upsert', [DynamicInsert::class, 'upsertData']);
 
@@ -35,7 +36,7 @@ Route::middleware('auth.token')->post('/call/procedure', [Procedure::class, 'cal
 Route::middleware('auth.token')->post('/upload-image', [Upload::class, 'imgUpload']);
 Route::middleware('auth.token')->post('/upload-doc', [Upload::class, 'docUpload']);
 
-Route::middleware('auth.token')->post('/email/send', [MailController::class, 'sendMail']);
+Route::post('/email/send', [MailController::class, 'sendMail']);
 Route::post('/email/reset', [MailController::class, 'sendResetPasswordEmail']);
 
 
