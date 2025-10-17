@@ -4,10 +4,15 @@
     </IfModule>
 
     RewriteEngine On
+    RewriteBase /laravel-api/
 
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # Handle X-Api-Key Header
+    RewriteCond %{HTTP:X-Api-Key} .
+    RewriteRule .* - [E=HTTP_X_API_KEY:%{HTTP:X-Api-Key}]
 
     # Redirect Trailing Slashes If Not A Folder...
     RewriteCond %{REQUEST_FILENAME} !-d
@@ -15,7 +20,7 @@
     RewriteRule ^ %1 [L,R=301]
 
     # Send Requests To Front Controller...
-    RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^ index.php [L]
 </IfModule>

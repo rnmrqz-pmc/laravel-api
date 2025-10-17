@@ -290,48 +290,75 @@ class Upload extends Controller
         }
     }
 
+    // public function docUpload(Request $request)
+    // {
+    //     $request->validate([
+    //         'document' => 'required|file|mimes:pdf,doc,docx,ppt,pptx,xls,xlsx,txt,rtf|max:15360'
+    //     ], [
+    //         'document.max' => 'The document must not be larger than 15 MB.',
+    //         'document.mimes' => 'The document must be a file of type: PDF, DOC, DOCX, PPT, or PPTX.',
+    //     ]);
+
+    //     $file = $request->file('document');
+        
+    //     // Generate secure filename
+    //     $filename = now()->format('YmdHis') . '_' . Str::random(12) . '.' . $file->getClientOriginalExtension();
+    //     $filePath = $request->input('filePath', 'documents');
+        
+    //     // Sanitize file path to prevent directory traversal
+    //     $filePath = str_replace(['..', '\\'], '', $filePath);
+        
+    //     try {
+    //         // Use putFileAs for better performance (single operation)
+    //         $path = Storage::disk('uploads')->putFileAs(
+    //             $filePath,
+    //             $file,
+    //             $filename,
+    //             'private' // using private visibility
+    //         );
+
+    //         return response()->json([
+    //             'status' => true,
+    //             // 'path' => Storage::disk('uploads')->url($path),
+    //             'filename' => $filename,
+    //             'size' => $file->getSize(),
+    //             'mime_type' => $file->getMimeType()
+    //         ]);
+            
+    //     } catch (\Exception $e) {
+    //         Log::error('Document upload failed: ' . $e->getMessage());
+            
+    //         return response()->json([
+    //             'status' => false,
+    //             'error' => 'Failed to upload document. Please try again.'
+    //         ], 500);
+    //     }
+    // }
     public function docUpload(Request $request)
     {
-    $request->validate([
-        'document' => 'required|file|mimes:pdf,doc,docx,ppt,pptx,xls,xlsx,txt,rtf|max:15360'
-    ], [
-        'document.max' => 'The document must not be larger than 15 MB.',
-        'document.mimes' => 'The document must be a file of type: PDF, DOC, DOCX, PPT, or PPTX.',
-    ]);
-
-    $file = $request->file('document');
-    
-    // Generate secure filename
-    $filename = now()->format('YmdHis') . '_' . Str::random(12) . '.' . $file->getClientOriginalExtension();
-    $filePath = $request->input('filePath', 'documents');
-    
-    // Sanitize file path to prevent directory traversal
-    $filePath = str_replace(['..', '\\'], '', $filePath);
-    
-    try {
-        // Use putFileAs for better performance (single operation)
-        $path = Storage::disk('uploads')->putFileAs(
-            $filePath,
-            $file,
-            $filename,
-            'private' // using private visibility
-        );
-
-        return response()->json([
-            'status' => true,
-            // 'path' => Storage::disk('uploads')->url($path),
-            'filename' => $filename,
-            'size' => $file->getSize(),
-            'mime_type' => $file->getMimeType()
+        $request->validate([
+            'document' => 'required|file|mimes:jpg,jpeg,png,pdf,doc,docx,ppt,pptx,xlsx,xls|max:15360', // 15 MB
+        ], [
+            'document.max' => 'The document must not be larger than 15 MB.',
         ]);
-        
-    } catch (\Exception $e) {
-        Log::error('Document upload failed: ' . $e->getMessage());
-        
-        return response()->json([
-            'status' => false,
-            'error' => 'Failed to upload document. Please try again.'
-        ], 500);
+
+        if ($request->hasFile('document')) {
+            $file = $request->file('document');
+
+            $filename = now()->format('YmdHis') . '_' . Str::random(12) . '.' . $file->getClientOriginalExtension();
+            $file_path = isset($request->filePath) ? $request->filePath : 'documents';
+            $path = $file->storeAs($file_path, $filename, 'uploads');
+
+            $data = [
+                'path' => Storage::url($path),
+                'filename' => $filename,
+                'name' => $file->getClientOriginalName()
+            ];
+            return response()->json([
+                'status' => true,
+                'data' => CustomHelper::encryptPayload($data),
+            ]);
+        }
+        return response()->json(['status' => false, 'error' => 'Image is required'], 200);
     }
-}
 }
